@@ -11,8 +11,22 @@ export const readRecentTicketIds = (
 ): string[] => {
   // Candidate task: make this robust against invalid JSON, non-array values,
   // empty ids, unavailable storage, and stale ids at the call site.
+  if(!storage) return [];
   const rawValue = storage?.getItem(RECENT_TICKETS_STORAGE_KEY);
-  return rawValue ? JSON.parse(rawValue) : [];
+
+  if(rawValue === null || rawValue === undefined) return [];
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawValue);
+  }
+  catch {
+    return [];
+  }
+
+  if(!Array.isArray(parsed)) return [];
+
+  return parsed.filter((item): item is string => typeof item === "string" && item.length > 0);
 };
 
 export const rememberRecentTicketId = (
