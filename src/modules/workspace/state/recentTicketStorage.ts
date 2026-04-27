@@ -9,8 +9,6 @@ export const RECENT_TICKETS_LIMIT = 3;
 export const readRecentTicketIds = (
   storage: KeyValueStorage | null = getBrowserStorage(),
 ): string[] => {
-  // Candidate task: make this robust against invalid JSON, non-array values,
-  // empty ids, unavailable storage, and stale ids at the call site.
   if(!storage) return [];
   const rawValue = storage?.getItem(RECENT_TICKETS_STORAGE_KEY);
 
