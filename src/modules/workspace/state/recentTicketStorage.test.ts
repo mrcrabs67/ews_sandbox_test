@@ -35,3 +35,39 @@ describe("recentTicketStorage", () => {
     ]);
   });
 });
+
+describe("readRecentTicketIds edge cases", () => {
+  it("returns empty array for corrupted JSON", () => {
+    const storage = createMemoryStorage();
+    storage.setItem(RECENT_TICKETS_STORAGE_KEY, "invalid json");
+    expect(readRecentTicketIds(storage)).toEqual([]);
+  });
+
+  it("returns empty array for non-array JSON", () => {
+    const storage = createMemoryStorage();
+    storage.setItem(
+        RECENT_TICKETS_STORAGE_KEY,
+        JSON.stringify({ some: "object" }),
+    );
+    expect(readRecentTicketIds(storage)).toEqual([]);
+  });
+
+  it("returns empty array for null JSON", () => {
+    const storage = createMemoryStorage();
+    storage.setItem(RECENT_TICKETS_STORAGE_KEY, "null");
+    expect(readRecentTicketIds(storage)).toEqual([]);
+  });
+
+  it("filters out empty and non-string items", () => {
+    const storage = createMemoryStorage();
+    storage.setItem(
+        RECENT_TICKETS_STORAGE_KEY,
+        JSON.stringify(["TCK-1001", "", 123, "TCK-1002"]),
+    );
+    expect(readRecentTicketIds(storage)).toEqual(["TCK-1001", "TCK-1002"]);
+  });
+
+  it("returns empty array when storage is missing", () => {
+    expect(readRecentTicketIds(null)).toEqual([]);
+  });
+});
